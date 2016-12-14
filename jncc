@@ -5,6 +5,8 @@ readonly CONFIG_FILE=${ROOT}/jncc.config
 readonly PID_FILE=${ROOT}/jncc.pid
 readonly VERSION=0.0.1
 readonly TEMP="$ROOT/`cat /dev/urandom| LC_CTYPE=C tr -dc 'A-Za-z0-9'| head -c 32`"
+readonly CONNECTED=0
+readonly NOT_CONNECTED=1
 
 error() {
     echo "$@" 1>&2
@@ -52,6 +54,14 @@ check_config() {
     [ -n "$ID" ] || abort "\$ID is empty."
     [ -n "$SERVER" ] || abort "\$SERVER is empty."
     [ -n "$SPLIT_HOSTS" ] || abort "\$SPLIT_HOSTS is empty."
+}
+
+is_connected() {
+    if [ -e "$PID_FILE" ]; then
+        return $CONNECTED
+    else
+        return $NOT_CONNECTED
+    fi
 }
 
 main() {
