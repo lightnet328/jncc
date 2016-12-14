@@ -68,6 +68,10 @@ connect() {
     is_connected && abort "Already connected."
 }
 
+disconnect() {
+    is_connected || abort "Not connected yet."
+}
+
 main() {
     source $CONFIG_FILE
     check_config
@@ -77,6 +81,7 @@ main() {
             connect
             ;;
         "disconnect")
+            disconnect
             ;;
         "-h" | "--help")
             usage
