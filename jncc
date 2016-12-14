@@ -37,9 +37,21 @@ Available commands:
 EOF
 }
 
+check_root() {
+    if [ "$USER" != "root" ]; then
+        cat <<EOF
+$SCRIPT_NAME requires root.
+You should try this command:
+$ sudo $0 $1
+EOF
+        exit 1
+    fi
+}
+
 main() {
     case "$1" in
         "connect")
+            check_root $1
             ;;
         "disconnect")
             ;;
