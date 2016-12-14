@@ -48,7 +48,15 @@ EOF
     fi
 }
 
+check_config() {
+    [ -n "$ID" ] || abort "\$ID is empty."
+    [ -n "$SERVER" ] || abort "\$SERVER is empty."
+    [ -n "$SPLIT_HOSTS" ] || abort "\$SPLIT_HOSTS is empty."
+}
+
 main() {
+    source $CONFIG_FILE
+    check_config
     case "$1" in
         "connect")
             check_root $1
