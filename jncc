@@ -64,12 +64,17 @@ is_connected() {
     fi
 }
 
+connect() {
+    is_connected && abort "Already connected."
+}
+
 main() {
     source $CONFIG_FILE
     check_config
     case "$1" in
         "connect")
             check_root $1
+            connect
             ;;
         "disconnect")
             ;;
