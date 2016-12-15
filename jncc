@@ -65,6 +65,11 @@ is_connected() {
     fi
 }
 
+input_password() {
+    read -sp "Password:" password
+    tty -s && echo
+}
+
 connect() {
     is_connected && abort "Already connected."
 }
