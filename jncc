@@ -1,10 +1,15 @@
 readonly ROOT=$(cd $(dirname $0) && pwd)
 readonly NAME="Juniper Network Connect Client"
 readonly SCRIPT_NAME=$(basename ${0})
-readonly CONFIG_FILE=${ROOT}/jncc.config
-readonly PID_FILE=${ROOT}/jncc.pid
+readonly CONFIG_FILE="$ROOT/jncc.config"
+readonly PID_FILE="$ROOT/jncc.pid"
+readonly LOG_FILE="$ROOT/jncc.log"
+readonly XENV_SCRIPT_FILE="$ROOT/xenv-script"
+readonly VPNC_SCRIPT_FILE="$ROOT/vpnc-script"
 readonly VERSION=0.0.1
 readonly TEMP="$ROOT/`cat /dev/urandom| LC_CTYPE=C tr -dc 'A-Za-z0-9'| head -c 32`"
+readonly CONNECTED=0
+readonly NOT_CONNECTED=1
 
 error() {
     echo "$@" 1>&2
@@ -54,14 +59,94 @@ check_config() {
     [ -n "$SPLIT_HOSTS" ] || abort "\$SPLIT_HOSTS is empty."
 }
 
+is_connected() {
+    if [ -e "$PID_FILE" ]; then
+        return $CONNECTED
+    else
+        return $NOT_CONNECTED
+    fi
+}
+
+fqdn2ip() {
+    for i in `seq 1 10`; do
+        ip=`nslookup $1 | grep Address | tail -n +2 | cut -f 2 -d ' '`
+        if [ -n "$ip" ]; then
+            echo $ip
+            return 0
+        fi
+        sleep 1
+    done
+    abort "Can't resolve $host."
+}
+
+export CISCO_SPLIT_INC=0
+add_split_ip() {
+    I=$CISCO_SPLIT_INC
+    export CISCO_SPLIT_INC_${I}_ADDR=$1
+    export CISCO_SPLIT_INC_${I}_MASK=255.255.255.255
+    export CISCO_SPLIT_INC_${I}_MASKLEN=32
+    export CISCO_SPLIT_INC=$(($I+1))
+}
+
+set_split_hosts() {
+    for host in ${SPLIT_HOSTS[@]}; do
+        add_split_ip `fqdn2ip $host`
+    done
+}
+
+generate_script() {
+    : > $XENV_SCRIPT_FILE
+    chmod +x $XENV_SCRIPT_FILE
+    echo "export CISCO_SPLIT_INC=$CISCO_SPLIT_INC" >> $XENV_SCRIPT_FILE
+    if [ -n "$CISCO_SPLIT_INC" ]; then
+        i=0
+        while [ $i -lt $CISCO_SPLIT_INC ] ; do
+            eval CISCO_SPLIT_INC_ADDR="\${CISCO_SPLIT_INC_${i}_ADDR}"
+            eval CISCO_SPLIT_INC_MASK="\${CISCO_SPLIT_INC_${i}_MASK}"
+            eval CISCO_SPLIT_INC_MASKLEN="\${CISCO_SPLIT_INC_${i}_MASKLEN}"
+            echo "export CISCO_SPLIT_INC_${i}_ADDR=$CISCO_SPLIT_INC_ADDR" >> $XENV_SCRIPT_FILE
+            echo "export CISCO_SPLIT_INC_${i}_MASK=$CISCO_SPLIT_INC_MASK" >> $XENV_SCRIPT_FILE
+            echo "export CISCO_SPLIT_INC_${i}_MASKLEN=$CISCO_SPLIT_INC_MASKLEN" >> $XENV_SCRIPT_FILE
+            i=$(($i+1))
+        done
+    fi
+    echo "exec $VPNC_SCRIPT_FILE" >> $XENV_SCRIPT_FILE
+}
+
+_openconnect() {
+    chmod +x $VPNC_SCRIPT_FILE
+    generate_script
+    printf "$password\n$REALM\n" | sudo -E openconnect --user $ID $SERVER --juniper --passwd-on-stdin --pid-file $PID_FILE --script $XENV_SCRIPT_FILE --background &> $LOG_FILE
+}
+
+input_password() {
+    read -sp "Password:" password
+    tty -s && echo
+}
+
+connect() {
+    is_connected && abort "Already connected."
+    input_password
+    _openconnect
+    set_split_hosts
+    _openconnect
+}
+
+disconnect() {
+    is_connected || abort "Not connected yet."
+    sudo kill -SIGINT `cat $PID_FILE`
+}
+
 main() {
     source $CONFIG_FILE
     check_config
     case "$1" in
         "connect")
             check_root $1
+            connect
             ;;
         "disconnect")
+            disconnect
             ;;
         "-h" | "--help")
             usage
