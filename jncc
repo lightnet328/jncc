@@ -76,6 +76,8 @@ input_password() {
 
 connect() {
     is_connected && abort "Already connected."
+    input_password
+    _openconnect
 }
 
 disconnect() {
