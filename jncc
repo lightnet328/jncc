@@ -65,6 +65,10 @@ is_connected() {
     fi
 }
 
+_openconnect() {
+    printf "$password\n$REALM\n" | sudo openconnect --user $ID $SERVER --juniper --passwd-on-stdin --background --pid-file $PID_FILE &> $LOG_FILE
+}
+
 input_password() {
     read -sp "Password:" password
     tty -s && echo
