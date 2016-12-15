@@ -82,6 +82,7 @@ connect() {
 
 disconnect() {
     is_connected || abort "Not connected yet."
+    sudo kill -SIGINT `cat $PID_FILE`
 }
 
 main() {
