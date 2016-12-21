@@ -120,6 +120,8 @@ _openconnect() {
 }
 
 input_password() {
+    echo $SERVER
+    echo "ID:$ID"
     read -sp "Password:" password
     tty -s && echo
 }
@@ -130,11 +132,13 @@ connect() {
     _openconnect
     set_split_hosts
     _openconnect
+    echo "Connected."
 }
 
 disconnect() {
     is_connected || abort "Not connected yet."
     sudo kill -SIGINT `cat $PID_FILE`
+    echo "Disconnected."
 }
 
 main() {
