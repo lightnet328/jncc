@@ -7,7 +7,6 @@ readonly LOG_FILE="$ROOT/jncc.log"
 readonly XENV_SCRIPT_FILE="$ROOT/xenv-script"
 readonly VPNC_SCRIPT_FILE="$ROOT/vpnc-script"
 readonly VERSION=0.0.1
-readonly TEMP="$ROOT/`cat /dev/urandom| LC_CTYPE=C tr -dc 'A-Za-z0-9'| head -c 32`"
 readonly REALM="NetworkConnect"
 readonly CONNECTED=0
 readonly NOT_CONNECTED=1
