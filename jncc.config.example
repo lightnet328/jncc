@@ -1,5 +1,51 @@
+#
+# This is the Juniper Network Conenct Client configuration file.
+# And it is written in shell script.
+#
+# Notice:
+#   Do not put spaces or tabs before or after equal.
+#
+#   ID = myid0123
+#     ^ ^
+#   Wow! Two spaces!
+#
+
+#
+# VPN user ID
+#
 ID=
+
+#
+# VPN Server Address
+#
+# Example:
+#   SERVER=vpn.tekitou.ac.jp
+#
 SERVER=
+
+#
+# Addresses you want to access via VPN
+#
+# Notice:
+#   The index of SPLIT_HOST must always start at 0 and must be incremented by 1.
+#   If you write as below you can not access orz.tekitou.ac.jp via VPN.
+#
+#   SPLIT_HOST[0]=inside.tekitou.ac.jp
+#   SPLIT_HOST[8]=orz.tekitou.ac.jp
+#              ^
+#   Next to 0 is 1 ;(
+#
+# Example:
+#   SPLIT_HOSTS[0]=portal.tekitou.ac.jp
+#   SPLIT_HOSTS[1]=xxx.tekitou.ac.jp
+#   SPLIT_HOSTS[2]=oxo.tekitou.ac.jp
+#
 SPLIT_HOSTS[0]=
 SPLIT_HOSTS[1]=
+
+#
+# Path to vpnc-script
+#
+# If you install openconnect using Homebrew, vpnc-script will be installed on /usr/local/etc/vpnc-script.
+#
 VPNC_SCRIPT_FILE=/usr/local/etc/vpnc-script
