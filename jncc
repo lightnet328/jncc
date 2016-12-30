@@ -59,6 +59,10 @@ check_config() {
     [ -n "$VPNC_SCRIPT_FILE" ] || abort "\$VPNC_SCRIPT_FILE is empty."
 }
 
+check_vpnc_script() {
+    [ -e "$VPNC_SCRIPT_FILE" ] || abort "$VPNC_SCRIPT_FILE does not exist."
+}
+
 is_connected() {
     if [ -e "$PID_FILE" ]; then
         return $CONNECTED
@@ -144,6 +148,7 @@ disconnect() {
 main() {
     source $CONFIG_FILE
     check_config
+    check_vpnc_script
     case "$1" in
         "connect")
             check_root $1
