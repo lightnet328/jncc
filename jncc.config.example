@@ -2,4 +2,4 @@ ID=
 SERVER=
 SPLIT_HOSTS[0]=
 SPLIT_HOSTS[1]=
-
+VPNC_SCRIPT_FILE=/usr/local/etc/vpnc-script
