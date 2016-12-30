@@ -155,6 +155,7 @@ main() {
             connect
             ;;
         "disconnect")
+            check_root $1
             disconnect
             ;;
         "-h" | "--help")
