@@ -56,6 +56,7 @@ check_config() {
     [ -n "$ID" ] || abort "\$ID is empty."
     [ -n "$SERVER" ] || abort "\$SERVER is empty."
     [ -n "$SPLIT_HOSTS" ] || abort "\$SPLIT_HOSTS is empty."
+    [ -n "$VPNC_SCRIPT_FILE" ] || abort "\$VPNC_SCRIPT_FILE is empty."
 }
 
 is_connected() {
